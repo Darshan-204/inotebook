@@ -24,19 +24,21 @@ router.post('/creatuser', [
     // console.log(req.body);
     //const user=User(req.body);
     //user.save();
-
+ let sucess=true;
     //requesting for the input
     //if there are errors,return bad request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        sucess =false;
+        return res.status(400).json({sucess:sucess, errors: errors.array() });
     }
 
     try {
         //check whether the user already exit are not 
         let user = await User.findOne({ email: req.body.email });
         if (user) {
-            return res.status(400).json({ errors: "sorry a user with email alresd exit" })
+            sucess=false;
+            return res.status(400).json({sucess:sucess, errors: "sorry a user with email alresd exit" })
         }
         const salt = await bcrypt.genSalt(10);
         const secPass = await bcrypt.hash(req.body.password, salt);
@@ -62,7 +64,8 @@ router.post('/creatuser', [
 
         const authToken = jwt.sign(data, JWT_SECRET);
         // res.json(user)
-        res.json({ authToken });
+         sucess=true;
+        res.json({sucess,authToken });
 
 
 
@@ -81,8 +84,11 @@ router.post('/login', [
 
 ], async (req, res) => {
     const errors = validationResult(req);
+    let sucess=true;
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        sucess=false;
+        return res.status(400).json({sucess:sucess,errors: errors.array() });
+        
     }
     const {email,password}=req.body;
     try{
@@ -90,22 +96,25 @@ router.post('/login', [
         let user=await User.findOne({email});
         if(!user)
             {
-                return res.status(400).json({error:"please try to login with correct credentials"});
+                sucess=false;
+                return res.status(400).json({sucess:sucess,error:"please try to login with correct credentials"});
             }
             const passordCompare=await bcrypt.compare(password,user.password);
             if(!passordCompare)
                 {
-                    return res.status(400).json({error:"please try to login with correct credentials"});
+                    sucess=false;
+                    return res.status(400).json({sucess:sucess,error:"please try to login with correct credentials"});
                 }
                 const data = {
                     user: {
                         id: user.id
                     }
                 }
+                sucess=true;
         
                 const authToken = jwt.sign(data, JWT_SECRET);
                 // res.json(user)
-                res.json({ authToken });
+                res.json({sucess:sucess, authToken:authToken });
 
     }
     catch(error)

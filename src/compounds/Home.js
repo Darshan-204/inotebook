@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useContext } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 //import NoteContext from '../context_notes/notes/noteContent'
 export default function Home() {
  //const a=useContext(NoteContext);
